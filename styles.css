@@ -1,0 +1,67 @@
+html,body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#board {
+    width: 80vh;
+    height: 80vh;
+    margin-inline: auto;
+    padding-top: 10vh;
+}
+
+.row {
+    display: flex;
+    width: fit-content;
+}
+
+.row>div {
+    width: 10vh;
+    height: 10vh;
+    background-color: rgb(119,149,86);
+    position: relative;
+}
+.row>div.selected {
+    background-color: rgba(187, 203, 43, 1);
+}
+
+.row:nth-child(even)>div:nth-child(even) {
+    background-color: rgb(235,236,208);
+}
+
+.row:nth-child(odd)>div:nth-child(odd) {
+    background-color: rgb(235,236,208);
+}
+
+.row:nth-child(even)>div.selected:nth-child(even) {
+    background-color: rgb(247, 247, 105);
+}
+
+.row:nth-child(odd)>div.selected:nth-child(odd) {
+    background-color: rgb(247, 247, 105);
+}
+
+.row>div>img {
+    width: 10vh;
+    height: 10vh;
+    -webkit-user-drag: none;
+}
+
+.dot::after {
+    content: "";
+    position: absolute;
+    width: 3vh;
+    aspect-ratio: 1/1;
+    background-color: rgba(0, 0, 0, .5);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
