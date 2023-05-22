@@ -1,7 +1,7 @@
 class Board {
   constructor(id) {
     this.id = id;
-    this.resetBoard();
+    //this.resetBoard();
   }
   htmlBoard = document.getElementById("board");
   board = [
@@ -57,7 +57,7 @@ class Board {
           node.innerHTML = ``;
           continue;
         }
-        node.innerHTML = `<img src="./images/${this.board[i][j]}.png">`;
+        node.innerHTML = `<img src="./website/images/${this.board[i][j]}.png">`;
       }
     }
     this.dots.forEach((pos) => {
@@ -81,7 +81,7 @@ class Board {
       this.resetSelectedNode(true);
       return;
     }
-    this.dots = pieces.getMovesForPiece(node, stdBoard);
+    this.dots = pieces.getValidMovesForPiece(node, stdBoard);
     this.selectedNode = node;
     this.resetBoard();
   }
@@ -94,10 +94,16 @@ class Board {
   }
   cloneBoard() {
     const newBoard = new Board("oui");
-    newBoard.board = Object.assign({}, this.board);
-    newBoard.moved = Object.assign({}, this.moved);
+    newBoard.board = JSON.parse(JSON.stringify(this.board))
+    newBoard.moved = JSON.parse(JSON.stringify(this.moved))
+    Object.assign({},this.board)
     return newBoard;
   }
+}
+
+
+class StdBoard extends Board {
+  
 }
 
 const stdBoard = new Board("stdBoard");

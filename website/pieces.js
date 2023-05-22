@@ -169,7 +169,7 @@ class Pieces {
     const piece = board.board[startPos.y][startPos.x],
       isWhite = piece.charAt(1) == "w" ? true : false,
       sideShort = isWhite ? "w" : "b";
-    /*switch (piece.charAt(0)) {
+    switch (piece.charAt(0)) {
       case "k":
         if (
           board.moved.find((e) => e.name == "k" + sideShort).moved ||
@@ -209,15 +209,15 @@ class Pieces {
         ).moved = true;
         console.log("r" + sideShort + (startPos.x == 0 ? "1" : "2"));
         break;
-    }*/
-
+    }
+    
     board.board[endPos.y][endPos.x] = board.board[startPos.y][startPos.x];
     board.board[startPos.y][startPos.x] = "";
+    console.log(JSON.parse(JSON.stringify(board)))
 
     board.resetSelectedNode(true);
   }
   getMovesForPiece(pos, board) {
-    console.log("board: ", board)
     const piece = board.board[pos.y][pos.x],
       moves = [],
       isWhite = piece.charAt(1) == "w";
