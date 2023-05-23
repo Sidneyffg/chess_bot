@@ -165,7 +165,6 @@ class Pieces {
   ];
   getMoves() {}
   movePiece(startPos, endPos, board) {
-    console.log(startPos, endPos, board);
     const piece = board.board[startPos.y][startPos.x],
       isWhite = piece.charAt(1) == "w" ? true : false,
       sideShort = isWhite ? "w" : "b";
@@ -207,15 +206,14 @@ class Pieces {
         board.moved.find(
           (e) => e.name == "r" + sideShort + (startPos.x == 0 ? "1" : "2")
         ).moved = true;
-        console.log("r" + sideShort + (startPos.x == 0 ? "1" : "2"));
         break;
     }
-    
+
     board.board[endPos.y][endPos.x] = board.board[startPos.y][startPos.x];
     board.board[startPos.y][startPos.x] = "";
-    console.log(JSON.parse(JSON.stringify(board)))
 
-    board.resetSelectedNode(true);
+    board.resetSelectedNode(false);
+    board.moveNum++;
   }
   getMovesForPiece(pos, board) {
     const piece = board.board[pos.y][pos.x],
@@ -235,6 +233,7 @@ class Pieces {
               return;
             moves.push(movePos);
           });
+        if (this.isInCheck(isWhite, board)) break;
         if (isWhite) {
           if (board.moved.find((e) => e.name == "kw").moved) break;
           if (
@@ -391,27 +390,37 @@ class Pieces {
   getValidMovesForPiece(pos, board) {
     const moves = this.getMovesForPiece(pos, board);
     const validMoves = [];
-    moves.forEach((move, idx) => {
+    moves.forEach((move) => {
       const newBoard = board.cloneBoard();
-      console.log(newBoard);
       this.movePiece(pos, move, newBoard);
-      if (this.isInCheck(!newBoard.isWhiteMove, newBoard)) return;
+      if (this.isInCheck(newBoard.isWhiteTurn, newBoard)) return;
       validMoves.push(move);
     });
     return validMoves;
   }
   isInCheck(isWhiteMove, board) {
     const kingPos = {},
+      otherKingPos = {},
       shortKing = "k" + (isWhiteMove ? "w" : "b");
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (board.board[i][j] !== shortKing) continue;
-        kingPos.x = j;
-        kingPos.y = i;
+        if (board.board[i][j].charAt(0) !== "k") continue;
+        if (board.board[i][j] == shortKing) {
+          kingPos.x = j;
+          kingPos.y = i;
+        } else {
+          otherKingPos.x = j;
+          otherKingPos.y = i;
+        }
       }
     }
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
+        if (
+          (kingPos.x == j && kingPos.y == i) ||
+          (otherKingPos.x == j && otherKingPos.y == i)
+        )
+          continue;
         if (
           this.getMovesForPiece({ x: j, y: i }, board).find(
             (e) => e.x == kingPos.x && e.y == kingPos.y
