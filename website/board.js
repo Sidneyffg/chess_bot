@@ -19,6 +19,14 @@ class Board {
       this.resetBoard();
     }
   }
+  cloneBoard() {
+    const newBoard = new Board(
+      JSON.parse(JSON.stringify(this.board)),
+      JSON.parse(JSON.stringify(this.moved))
+    );
+    newBoard.isWhiteTurn = this.isWhiteTurn;
+    return newBoard;
+  }
 }
 
 class StdBoard extends Board {
@@ -114,27 +122,19 @@ class StdBoard extends Board {
     if (pieces.isInCheck(this.isWhiteTurn, this)) return true;
     return null;
   }
-  cloneBoard() {
-    const newBoard = new Board(
-      JSON.parse(JSON.stringify(this.board)),
-      JSON.parse(JSON.stringify(this.moved))
-    );
-    newBoard.isWhiteTurn = this.isWhiteTurn;
-    return newBoard;
-  }
 }
 
 const stdBoard = new StdBoard([
-  ["kb", "", "", "", "", "", "", ""],
+  ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
+  ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
+  ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
   ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
 ]);
-
+const bot = new Bot(false);
 /* std board 
 ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
 ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],

@@ -207,6 +207,10 @@ class Pieces {
           (e) => e.name == "r" + sideShort + (startPos.x == 0 ? "1" : "2")
         ).moved = true;
         break;
+      case "p":
+        if (endPos.y == 0 || endPos.y == 7) {
+          
+        }
     }
 
     board.board[endPos.y][endPos.x] = board.board[startPos.y][startPos.x];
