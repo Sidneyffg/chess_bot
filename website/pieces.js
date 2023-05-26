@@ -3,6 +3,7 @@ class Pieces {
     {
       name: "king",
       short: "k",
+      points: 100,
       moves: [
         [-1, -1],
         [0, -1],
@@ -17,6 +18,7 @@ class Pieces {
     {
       name: "queen",
       short: "q",
+      points: 9,
       moves: [
         [-1, 0],
         [-2, 0],
@@ -79,6 +81,7 @@ class Pieces {
     {
       name: "rook",
       short: "r",
+      points: 5,
       moves: [
         [-1, 0],
         [-2, 0],
@@ -113,6 +116,7 @@ class Pieces {
     {
       name: "bishop",
       short: "b",
+      points: 3,
       moves: [
         [-1, -1],
         [-2, -2],
@@ -147,6 +151,7 @@ class Pieces {
     {
       name: "knight",
       short: "n",
+      points: 3,
       moves: [
         [-2, -1],
         [-1, -2],
@@ -161,6 +166,7 @@ class Pieces {
     {
       name: "pawn",
       short: "p",
+      points: 1
     },
   ];
   getMoves() {}
@@ -209,7 +215,7 @@ class Pieces {
         break;
       case "p":
         if (endPos.y == 0 || endPos.y == 7) {
-          
+          board.board[startPos.y][startPos.x] = "q" + sideShort;
         }
     }
 

@@ -92,6 +92,10 @@ class StdBoard extends Board {
       pieces.movePiece(this.selectedNode, node, stdBoard);
       this.isWhiteTurn = !this.isWhiteTurn;
       this.resetBoard();
+      setTimeout(() => {
+        bot.genNewMove(this);
+        this.isWhiteTurn = !this.isWhiteTurn;
+      }, 100);
       const ended = this.hasGameEnded();
       if (ended)
         console.log((this.isWhiteTurn ? "Black" : "White") + " has won!");
@@ -125,14 +129,14 @@ class StdBoard extends Board {
 }
 
 const stdBoard = new StdBoard([
-  ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
-  ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
+  ["", "qb", "", "", "", "", "", "kb"],
+  ["", "", "rb", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
-  ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
-  ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
+  ["", "kw", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
 ]);
 const bot = new Bot(false);
 /* std board 
