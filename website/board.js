@@ -44,19 +44,19 @@ class StdBoard extends Board {
         },
         {
           name: "kw",
-          moved: false,
+          moved: true,
         },
         {
           name: "rb1",
-          moved: false,
+          moved: true,
         },
         {
           name: "rb2",
-          moved: false,
+          moved: true,
         },
         {
           name: "kb",
-          moved: false,
+          moved: true,
         },
       ],
       []
@@ -92,14 +92,15 @@ class StdBoard extends Board {
       pieces.movePiece(this.selectedNode, node, stdBoard);
       this.isWhiteTurn = !this.isWhiteTurn;
       this.resetBoard();
-      setTimeout(() => {
-        bot.genNewMove(this);
-        this.isWhiteTurn = !this.isWhiteTurn;
-      }, 100);
       const ended = this.hasGameEnded();
       if (ended)
         console.log((this.isWhiteTurn ? "Black" : "White") + " has won!");
       else if (ended == null) console.log("Stalemate");
+      else
+        setTimeout(() => {
+          bot.genNewMove(this);
+          this.isWhiteTurn = !this.isWhiteTurn;
+        }, 100);
       return;
     } else if (!this.board[node.y][node.x]) {
       this.resetSelectedNode(true);
@@ -129,14 +130,14 @@ class StdBoard extends Board {
 }
 
 const stdBoard = new StdBoard([
-  ["", "qb", "", "", "", "", "", "kb"],
-  ["", "", "rb", "", "", "", "", ""],
+  ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
+  ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
-  ["", "kw", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
+  ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
+  ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
 ]);
 const bot = new Bot(false);
 /* std board 
@@ -148,4 +149,23 @@ const bot = new Bot(false);
 ["", "", "", "", "", "", "", ""],
 ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
 ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
+
+
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "kb", "", "", "", ""],
+  ["", "kw", "", "qb", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+
+["", "", "", "", "", "rb", "kb", ""],
+  ["pb", "pb", "pb", "", "", "", "pb", ""],
+  ["", "", "", "", "", "rb", "", ""],
+  ["", "", "", "pb", "pb", "", "bw", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "pw", "", "", "pw", "qb"],
+  ["pw", "pw", "pw", "", "", "", "", ""],
+  ["rw", "", "", "", "", "qw", "kw", "rw"],
 */

@@ -166,7 +166,7 @@ class Pieces {
     {
       name: "pawn",
       short: "p",
-      points: 1
+      points: 1,
     },
   ];
   getMoves() {}
@@ -243,7 +243,7 @@ class Pieces {
               return;
             moves.push(movePos);
           });
-        if (this.isInCheck(isWhite, board)) break;
+        //if (this.isInCheck(isWhite, board)) break;
         if (isWhite) {
           if (board.moved.find((e) => e.name == "kw").moved) break;
           if (
@@ -410,27 +410,16 @@ class Pieces {
   }
   isInCheck(isWhiteMove, board) {
     const kingPos = {},
-      otherKingPos = {},
       shortKing = "k" + (isWhiteMove ? "w" : "b");
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (board.board[i][j].charAt(0) !== "k") continue;
-        if (board.board[i][j] == shortKing) {
-          kingPos.x = j;
-          kingPos.y = i;
-        } else {
-          otherKingPos.x = j;
-          otherKingPos.y = i;
-        }
+        if (board.board[i][j] !== shortKing) continue;
+        kingPos.x = j;
+        kingPos.y = i;
       }
     }
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (
-          (kingPos.x == j && kingPos.y == i) ||
-          (otherKingPos.x == j && otherKingPos.y == i)
-        )
-          continue;
         if (
           this.getMovesForPiece({ x: j, y: i }, board).find(
             (e) => e.x == kingPos.x && e.y == kingPos.y
