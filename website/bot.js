@@ -1,3 +1,4 @@
+const inf = 999999999;
 class Bot {
   constructor(isWhite) {
     this.isWhite = isWhite;
@@ -73,7 +74,7 @@ class Bot {
       if (pieces.isInCheck(board.isWhiteTurn, board)) {
         console.log("yes", board.isWhiteTurn ? -Infinity : Infinity);
         return {
-          eval: board.isWhiteTurn ? -Infinity : Infinity,
+          eval: board.isWhiteTurn ? -inf + depth : inf - depth,
           startMove: startMove,
         };
       }
@@ -94,6 +95,18 @@ class Bot {
 
     //king safety
 
+    //piece activity
+
+    //structure
+    let wMoves = [],
+      bMoves = [];
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (board.board[i][j] == "") continue;
+      }
+    }
+
+    //material
     let wPoints = 0,
       bPoints = 0;
     for (let i = 0; i < 8; i++) {
