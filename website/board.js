@@ -44,19 +44,19 @@ class StdBoard extends Board {
         },
         {
           name: "kw",
-          moved: true,
+          moved: false,
         },
         {
           name: "rb1",
-          moved: true,
+          moved: false,
         },
         {
           name: "rb2",
-          moved: true,
+          moved: false,
         },
         {
           name: "kb",
-          moved: true,
+          moved: false,
         },
       ],
       []
@@ -130,14 +130,14 @@ class StdBoard extends Board {
 }
 
 const stdBoard = new StdBoard([
-  ["", "", "", "rb", "", "rb", "kb", ""],
-  ["", "", "", "", "", "pb", "bb", "pb"],
-  ["", "pb", "qb", "", "pb", "", "pb", ""],
-  ["pb", "", "", "pb", "", "", "", ""],
-  ["", "", "pw", "pw", "pw", "", "", ""],
-  ["", "pw", "", "bw", "", "qw", "pw", ""],
-  ["", "", "", "", "", "", "pw", "pw"],
-  ["rw", "", "", "", "", "rw", "kw", ""],
+  ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
+  ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", ""],
+  ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
+  ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
 ]);
 const bot = new Bot(false);
 /* std board 

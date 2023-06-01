@@ -8,8 +8,9 @@ class Bot {
   colorShort;
   generatingMoves = false;
   genNewMove(board) {
+    const time = Date.now();
     const move = this.newMove(board, 4);
-    console.log(move);
+    console.log(move, Date.now() - time);
     pieces.movePiece(move.startMove.start, move.startMove.end, stdBoard);
     stdBoard.resetBoard();
   }
@@ -39,22 +40,11 @@ class Bot {
           let r;
           if (startMove) {
             r = this.newMove(newBoard, maxDepth, depth + 1, startMove);
-            if (r === undefined) {
-              console.log(newBoard, maxDepth, depth + 1, startMove);
-            }
           } else {
             r = this.newMove(newBoard, maxDepth, depth + 1, {
               start: { x: j, y: i },
               end: move,
             });
-            if (r === undefined) {
-              console.log(newBoard, maxDepth, depth + 1, {
-                start: { x: j, y: i },
-                end: move,
-              });
-            }
-          }
-          if (r == undefined) {
           }
           if (board.isWhiteTurn) {
             if (r.eval >= highestEval) {
@@ -103,8 +93,25 @@ class Bot {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (board.board[i][j] == "") continue;
+        pieces.getMovesForPiece({ x: j, y: i }, board).forEach((move) => {
+          if (board.board[i][j].charAt(1) == "w") {
+            wMoves.push(move);
+          } else {
+            bMoves.push(move);
+          }
+        });
       }
     }
+
+    wMoves = wMoves.filter(
+      (value, index, self) =>
+        index === self.findIndex((t) => t.x === value.x && t.y === value.y)
+    );
+
+    bMoves = bMoves.filter(
+      (value, index, self) =>
+        index === self.findIndex((t) => t.x === value.x && t.y === value.y)
+    );
 
     //material
     let wPoints = 0,
@@ -123,6 +130,6 @@ class Bot {
         }
       }
     }
-    return wPoints - bPoints;
+    return wPoints - bPoints + (wMoves.length - bMoves.length) / 2;
   }
 }
