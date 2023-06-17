@@ -169,115 +169,114 @@ class Pieces {
       points: 1,
     },
   ];
-  getMoves() {}
   movePiece(startPos, endPos, board) {
-    const piece = board.board[startPos.y][startPos.x],
-      isWhite = piece.charAt(1) == "w" ? true : false,
-      sideShort = isWhite ? "w" : "b";
-    switch (piece.charAt(0)) {
+    const piece = board[startPos],
+      lowKey = this.toLowerCase(piece),
+      isWhite = this.isPieceWhite(piece);
+    switch (lowKey) {
       case "k":
+        const startX = startPos & 7,
+          endX = endPos & 7
         if (
-          board.moved.find((e) => e.name == "k" + sideShort).moved ||
-          (endPos.x !== 2 && endPos.x !== 6) ||
-          startPos.x !== 4
+          board[this.boardKingPos(isWhite)] == "1" ||
+          (endX !== 2 && endX !== 6) ||
+          startX !== 4
         ) {
-          board.moved.find((e) => e.name == "k" + sideShort).moved = true;
+          board = this.setCharAt(board, this.boardKingPos(isWhite), "1");
           break;
         }
         if (isWhite) {
-          if (endPos.x == 2) {
-            board.board[7][0] = "";
-            board.board[7][3] = "rw";
+          if (endX == 2) {
+            board = this.setCharAt(board, 56, "e");
+            board = this.setCharAt(board, 59, "R");
           } else {
-            board.board[7][7] = "";
-            board.board[7][5] = "rw";
+            board = this.setCharAt(board, 63, "e");
+            board = this.setCharAt(board, 61, "R");
           }
         } else {
-          if (endPos.x == 2) {
-            board.board[0][0] = "";
-            board.board[0][3] = "rb";
+          if (endX == 2) {
+            board = this.setCharAt(board, 0, "e");
+            board = this.setCharAt(board, 3, "r");
           } else {
-            board.board[0][7] = "";
-            board.board[0][5] = "rb";
+            board = this.setCharAt(board, 7, "e");
+            board = this.setCharAt(board, 5, "r");
           }
         }
-        board.moved.find((e) => e.name == "k" + sideShort).moved = true;
+        board = this.setCharAt(board, this.boardKingPos(isWhite), "1");
         break;
       case "r":
+        const startx = startPos & 7,
+          starty = startPos >>> 3
         if (
-          (startPos.x !== 0 && startPos.x !== 7) ||
-          (startPos.y !== 0 && startPos.y !== 7)
+          (startx !== 0 && startx !== 7) ||
+          (starty !== 0 && starty !== 7)
         )
           break;
-        board.moved.find(
-          (e) => e.name == "r" + sideShort + (startPos.x == 0 ? "1" : "2")
-        ).moved = true;
+        board = this.setCharAt(board, this.boardRookPos(isWhite, startx == 0), "1");
         break;
       case "p":
-        if (endPos.y == 0 || endPos.y == 7) {
-          board.board[startPos.y][startPos.x] = "q" + sideShort;
+        const pY = endPos >>> 3
+        if (pY == 0 || pY == 7) {
+          board = this.setCharAt(board, startPos, isWhite ? "Q" : "q");
         }
     }
+    board = this.setCharAt(board, endPos, board[startPos]);
+    board = this.setCharAt(board, startPos, "e");
 
-    board.board[endPos.y][endPos.x] = board.board[startPos.y][startPos.x];
-    board.board[startPos.y][startPos.x] = "";
-
-    board.resetSelectedNode(false);
-    board.moveNum++;
+    return board
   }
   getMovesForPiece(pos, board) {
-    const piece = board.board[pos.y][pos.x],
+    const piece = board[pos],
       moves = [],
-      isWhite = piece.charAt(1) == "w";
-    switch (piece.charAt(0)) {
+      isWhite = this.isPieceWhite(piece);
+    switch (this.toLowerCase(piece)) {
       case "k":
         this.pieces
           .find((e) => e.short == "k")
           .moves.forEach((move) => {
-            const movePos = { x: pos.x + move[0], y: pos.y + move[1] };
-            if (!this.#isValidPos(movePos)) return;
+            if (!this.#isValidPos(pos, move)) return;
+            const movePos = pos + move[0] + move[1]*8
             if (
-              board.board[movePos.y][movePos.x] !== "" &&
-              board.board[movePos.y][movePos.x].charAt(1) == piece.charAt(1)
+              board[movePos] !== "e" &&
+              this.isPieceWhite(board[movePos]) == isWhite
             )
               return;
             moves.push(movePos);
           });
-        //if (this.isInCheck(isWhite, board)) break;
         if (isWhite) {
-          if (board.moved.find((e) => e.name == "kw").moved) break;
+          if (board[this.boardKingPos(true)]) break;
           if (
-            board.board[7][0] == "rw" &&
-            board.board[7][1] == "" &&
-            board.board[7][2] == "" &&
-            board.board[7][3] == "" &&
-            !board.moved.find((e) => e.name == "rw1").moved
+            board[56] == "r" &&
+            board[57] == "e" &&
+            board[58] == "e" &&
+            board[59] == "e" &&
+            !board[this.boardRookPos(true, true)]
           )
-            moves.push({ x: 2, y: 7 });
+            moves.push(23);
           if (
-            board.board[7][5] == "" &&
-            board.board[7][6] == "" &&
-            board.board[7][7] == "rw" &&
-            !board.moved.find((e) => e.name == "rw2").moved
+            board[61] == "e" &&
+            board[62] == "e" &&
+            board[63] == "r" &&
+            !board[this.boardRookPos(true, false)]
           )
-            moves.push({ x: 6, y: 7 });
+            moves.push(55);
         } else {
-          if (board.moved.find((e) => e.name == "kb").moved) break;
+          if (board[this.boardKingPos(false)]) break;
           if (
-            board.board[0][0] == "rb" &&
-            board.board[0][1] == "" &&
-            board.board[0][2] == "" &&
-            board.board[0][3] == "" &&
-            !board.moved.find((e) => e.name == "rb1").moved
+            board[0] == "r" &&
+            board[1] == "e" &&
+            board[2] == "e" &&
+            board[3] == "e" &&
+            !board[this.boardRookPos(false, true)]
           )
-            moves.push({ x: 2, y: 0 });
+            moves.push(16);
           if (
-            board.board[0][5] == "" &&
-            board.board[0][6] == "" &&
-            board.board[0][7] == "rb" &&
-            !board.moved.find((e) => e.name == "rb2").moved
+            board[5] == "e" &&
+            board[6] == "e" &&
+            board[7] == "r" &&
+            !board[this.boardRookPos(false, false)]
           )
-            moves.push({ x: 6, y: 0 });
+            moves.push(48);
         }
         break;
       case "q":
@@ -285,14 +284,11 @@ class Pieces {
         for (let s = 0; s < 8; s++) {
           //side
           for (let i = 0; i < 7; i++) {
-            const movePos = {
-              x: pos.x + qMoves[s * 7 + i][0],
-              y: pos.y + qMoves[s * 7 + i][1],
-            };
-            if (!this.#isValidPos(movePos)) break;
-            if (board.board[movePos.y][movePos.x] !== "") {
+            if (!this.#isValidPos(pos, qMoves[s * 7 + i])) break;
+            const movePos = pos + qMoves[s * 7 + i][0] + qMoves[s * 7 + i][1] * 8;
+            if (board[movePos] !== "e") {
               if (
-                board.board[movePos.y][movePos.x].charAt(1) == piece.charAt(1)
+                this.isPieceWhite(board[movePos]) == isWhite
               )
                 break;
               moves.push(movePos);
@@ -307,14 +303,11 @@ class Pieces {
         for (let s = 0; s < 4; s++) {
           //side
           for (let i = 0; i < 7; i++) {
-            const movePos = {
-              x: pos.x + rMoves[s * 7 + i][0],
-              y: pos.y + rMoves[s * 7 + i][1],
-            };
-            if (!this.#isValidPos(movePos)) break;
-            if (board.board[movePos.y][movePos.x] !== "") {
+            if (!this.#isValidPos(pos, rMoves[s * 7 + i])) break;
+            const movePos = pos + rMoves[s * 7 + i][0] + rMoves[s * 7 + i][1]* 8;
+            if (board[movePos] !== "e") {
               if (
-                board.board[movePos.y][movePos.x].charAt(1) == piece.charAt(1)
+                this.isPieceWhite(board[movePos]) == isWhite
               )
                 break;
               moves.push(movePos);
@@ -329,14 +322,11 @@ class Pieces {
         for (let s = 0; s < 4; s++) {
           //side
           for (let i = 0; i < 7; i++) {
-            const movePos = {
-              x: pos.x + bMoves[s * 7 + i][0],
-              y: pos.y + bMoves[s * 7 + i][1],
-            };
-            if (!this.#isValidPos(movePos)) break;
-            if (board.board[movePos.y][movePos.x] !== "") {
+            if (!this.#isValidPos(pos, bMoves[s * 7 + i])) break;
+            const movePos = pos + bMoves[s * 7 + i][0] + bMoves[s * 7 + i][1]* 8;
+            if (board[movePos] !== "e") {
               if (
-                board.board[movePos.y][movePos.x].charAt(1) == piece.charAt(1)
+                this.isPieceWhite(board[movePos]) == isWhite
               )
                 break;
               moves.push(movePos);
@@ -350,11 +340,11 @@ class Pieces {
         this.pieces
           .find((e) => e.short == "n")
           .moves.forEach((move) => {
-            const movePos = { x: pos.x + move[0], y: pos.y + move[1] };
-            if (!this.#isValidPos(movePos)) return;
+            if (!this.#isValidPos(pos, move)) return;
+            const movePos = pos + move[0] + move[1]* 8;
             if (
-              board.board[movePos.y][movePos.x] !== "" &&
-              board.board[movePos.y][movePos.x].charAt(1) == piece.charAt(1)
+              board[movePos] !== "e" &&
+              this.isPieceWhite(board[movePos]) == isWhite
             )
               return;
             moves.push(movePos);
@@ -362,79 +352,76 @@ class Pieces {
         break;
       case "p":
         if (isWhite) {
-          const movePos = { x: pos.x - 1, y: pos.y - 1 };
-          if (this.checkNode(movePos, board) == "b")
-            moves.push(Object.assign({}, movePos));
-          movePos.x += 2;
-          if (this.checkNode(movePos, board) == "b")
-            moves.push(Object.assign({}, movePos));
-          movePos.x--;
-          if (this.checkNode(movePos, board) !== "") break;
-          moves.push(Object.assign({}, movePos));
-          movePos.y--;
-          if (pos.y == 6 && this.checkNode(movePos, board) === "")
-            moves.push(movePos);
+          let changePos = [-1,-1];
+          if (this.checkNode(pos, changePos, board) == "b")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[0]+=2;
+          if (this.checkNode(pos, changePos, board) == "b")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[0]--;
+          if (board[pos + changePos[0] + changePos[1] * 8] !== "e") break;
+          moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[1]--;;
+          if ((pos >>> 3) == 6 && board[pos + changePos[0] + changePos[1] * 8] === "e")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
         } else {
-          const movePos = { x: pos.x - 1, y: pos.y + 1 };
-          if (this.checkNode(movePos, board) == "w")
-            moves.push(Object.assign({}, movePos));
-          movePos.x += 2;
-          if (this.checkNode(movePos, board) == "w")
-            moves.push(Object.assign({}, movePos));
-          movePos.x--;
-          if (this.checkNode(movePos, board) !== "") break;
-          moves.push(Object.assign({}, movePos));
-          movePos.y++;
-          if (pos.y == 1 && this.checkNode(movePos, board) === "")
-            moves.push(movePos);
+          let changePos = [-1,1];
+          if (this.checkNode(pos, changePos, board) == "w")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[0] += 2;
+          if (this.checkNode(pos, changePos, board) == "w")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[0]--;
+          if (board[pos + changePos[0] + changePos[1] * 8] !== "e") break;
+          moves.push(pos + changePos[0] + changePos[1] * 8);
+          changePos[1] ++;
+          if ((pos >>> 3) == 1 && board[pos + changePos[0] + changePos[1] * 8] === "e")
+            moves.push(pos + changePos[0] + changePos[1] * 8);
         }
+        
         break;
     }
     return moves;
   }
-  checkNode(pos, board) {
-    if (!this.#isValidPos(pos)) return false;
-    if (board.board[pos.y][pos.x] == "") return "";
-    return board.board[pos.y][pos.x].charAt(1);
+  checkNode(startPos, changePos, board) {
+    if (!this.#isValidPos(startPos, changePos)) return false;
+    const newPos = startPos + changePos[0] + changePos[1] * 8;
+    if (board[newPos] == "e") return "e";
+    return this.isPieceWhite(board[newPos]) ? "w" : "b";
   }
   getValidMovesForPiece(pos, board) {
     const moves = this.getMovesForPiece(pos, board);
     const validMoves = [];
     moves.forEach((move) => {
-      const newBoard = board.cloneBoard();
-      this.movePiece(pos, move, newBoard);
-      if (this.isInCheck(newBoard.isWhiteTurn, newBoard)) return;
+      let newBoard = board;
+      newBoard = this.movePiece(pos, move, newBoard);
+      if (this.isInCheck(newBoard[64] == "1", newBoard)) return;
       validMoves.push(move);
     });
     return validMoves;
   }
   isInCheck(isWhiteMove, board) {
-    const kingPos = {},
-      shortKing = "k" + (isWhiteMove ? "w" : "b");
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (board.board[i][j] !== shortKing) continue;
-        kingPos.x = j;
-        kingPos.y = i;
-      }
+    let kingPos,
+      shortKing = isWhiteMove ? "K" : "k";
+    for (let i = 0; i < 64; i++) {
+      if (board[i] !== shortKing) continue;
+      kingPos = i;
     }
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (
-          this.getMovesForPiece({ x: j, y: i }, board).find(
-            (e) => e.x == kingPos.x && e.y == kingPos.y
-          )
+    for (let i = 0; i < 64; i++) {
+      if (board[i] !== "e" &&
+        this.getMovesForPiece(i, board).find(
+          (e) => e == kingPos
         )
-          return true;
-      }
+      )
+      return true;
     }
     return false;
   }
-  #isValidPos(...args) {
-    for (let i = 0; i < args.length; i++) {
-      if (args[i].x >= 8 || args[i].x < 0) return false;
-      if (args[i].y >= 8 || args[i].y < 0) return false;
-    }
+  #isValidPos(startPos, changePos) {
+    const startY = startPos >>> 3,
+      startX = startPos & 7;
+    if (startX + changePos[0] >= 8 || startX + changePos[0] < 0) return false;
+    if (startY + changePos[1] >= 8 || startY + changePos[1] < 0) return false;
     return true;
   }
   nameToShort(name) {
@@ -442,6 +429,33 @@ class Pieces {
   }
   shortToName(short) {
     return pieces.find((e) => e.short == short.charAt(0)).name;
+  }
+  whitePiecesArr = ["K","Q","R","B","N","P"]
+  blackPiecesArr = ["k","q","r","b","n","p"]
+  isPieceWhite(piece) {
+    //return piece == piece.toUpperCase();
+    return this.whitePiecesArr.includes(piece)
+  }
+  isPieceBlack(piece) {
+    //return piece == piece.toLowerCase();
+    return this.blackPiecesArr.includes(piece)
+  }
+  toLowerCase(piece) {
+    for(let i = 0;i<6;i++){
+      if(piece == this.whitePiecesArr[i]){
+        return this.blackPiecesArr[i];
+      }
+    }
+    return piece;
+  }
+  boardKingPos(isWhite) {
+    return 66 + 3 * isWhite;
+  }
+  boardRookPos(isWhite, leftRook) {
+    return 65 + 3 * isWhite + 2 * !leftRook;
+  }
+  setCharAt(str, index, chr) {
+    return str.substring(0, index) + chr + str.substring(index + 1);
   }
 }
 const pieces = new Pieces();

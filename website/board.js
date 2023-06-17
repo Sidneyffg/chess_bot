@@ -1,4 +1,8 @@
-class Board {
+const boardBoard =
+  "rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR1000000";
+  //stdBoard rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR1000000
+//pieces -> isWhiteTurn -> r/k moved
+/*class Board {
   constructor(board, moved, pawnMoves) {
     this.board = board;
     this.moved = moved;
@@ -19,143 +23,100 @@ class Board {
       this.resetBoard();
     }
   }
-  cloneBoard() {
-    const newBoard = new Board(
-      JSON.parse(JSON.stringify(this.board)),
-      JSON.parse(JSON.stringify(this.moved))
-    );
-    newBoard.isWhiteTurn = this.isWhiteTurn;
-    return newBoard;
-  }
-}
+}*/
 
-class StdBoard extends Board {
+class Board {
   constructor(board) {
-    super(
-      board,
-      [
-        {
-          name: "rw1",
-          moved: false,
-        },
-        {
-          name: "rw2",
-          moved: false,
-        },
-        {
-          name: "kw",
-          moved: false,
-        },
-        {
-          name: "rb1",
-          moved: false,
-        },
-        {
-          name: "rb2",
-          moved: false,
-        },
-        {
-          name: "kb",
-          moved: false,
-        },
-      ],
-      []
-    );
+    this.board = board;
     this.resetBoard();
   }
+  dots = []
+  selectedNode = null
   htmlBoard = document.getElementById("board");
+  perft(){
+    this.board = pieces.setCharAt(this.board,64,"1");
+    bot.genNewMove(this.board);
+    console.log("perft: " + count2)
+  }
   resetBoard() {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
+        let pos = i*8+j;
         const node = this.htmlBoard.children[i].children[j];
         node.classList = "";
         node.onclick = () => {
-          this.clickNode({ x: j, y: i });
+          this.clickNode(pos);
         };
-        if (!this.board[i][j]) {
+        if (this.board[pos] == "e") {
           node.innerHTML = ``;
           continue;
         }
-        node.innerHTML = `<img src="./website/images/${this.board[i][j]}.png">`;
+        let isWhite = pieces.isPieceWhite(this.board[pos])
+        node.innerHTML = `<img src="./website/images/${pieces.toLowerCase(this.board[pos]) + (isWhite ? "w":"b")}.png">`;
       }
     }
     this.dots.forEach((pos) => {
-      this.htmlBoard.children[pos.y].children[pos.x].classList.add("dot");
+      let y = pos>>>3;
+      this.htmlBoard.children[y].children[pos - y*8].classList.add("dot");
     });
     if (!this.selectedNode) return;
-    this.htmlBoard.children[this.selectedNode.y].children[
-      this.selectedNode.x
+    let y = this.selectedNode>>>3;
+    this.htmlBoard.children[y].children[
+      this.selectedNode - y*8
     ].classList.add("selected");
   }
   clickNode(node) {
-    if (this.dots.find((e) => e.x == node.x && e.y == node.y)) {
-      pieces.movePiece(this.selectedNode, node, stdBoard);
-      this.isWhiteTurn = !this.isWhiteTurn;
-      this.resetBoard();
+    console.log(node)
+    if (this.dots.includes(node)) {
+      this.board = pieces.movePiece(this.selectedNode, node, this.board);
+      this.board = pieces.setCharAt(this.board, 64, this.board[64] == "1"?"0":"1")
+      this.resetSelectedNode(true)
       const ended = this.hasGameEnded();
       if (ended)
-        console.log((this.isWhiteTurn ? "Black" : "White") + " has won!");
+        console.log((this.board[64] == "1" ? "Black" : "White") + " has won!");
       else if (ended == null) console.log("Stalemate");
       else
         setTimeout(() => {
-          bot.genNewMove(this);
-          this.isWhiteTurn = !this.isWhiteTurn;
+          //bot.genNewMove(this.board);
+          //this.board = pieces.setCharAt(this.board,64,this.board[64] == "1" ? "0":"1");
         }, 100);
       return;
-    } else if (!this.board[node.y][node.x]) {
+    } else if (this.board[node] == "e") {
       this.resetSelectedNode(true);
       return;
     }
-    if ((this.board[node.y][node.x].charAt(1) == "w") !== this.isWhiteTurn) {
+    if (pieces.isPieceWhite(this.board[node]) !== (this.board[64] == "1")) {
       this.resetSelectedNode(true);
       return;
     }
-    this.dots = pieces.getValidMovesForPiece(node, stdBoard);
+    this.dots = pieces.getValidMovesForPiece(node, this.board);
     this.selectedNode = node;
     this.resetBoard();
   }
+  resetSelectedNode(resetBoard) {
+    this.selectedNode = null;
+    this.dots = [];
+    if (resetBoard) {
+      this.resetBoard();
+    }
+  }
   hasGameEnded() {
-    const color = this.isWhiteTurn ? "w" : "b";
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (this.board[i][j].charAt(1) != color) continue;
-        if (pieces.getValidMovesForPiece({ x: j, y: i }, this).length !== 0) {
-          return false;
-        }
+    for (let i = 0; i < 64; i++) {
+      console.log(this.board[i], this.board[64])
+      if (pieces.isPieceBlack(this.board[i]) == (this.board[64] == "1")) continue;
+      //console.log(this.board[i], this.board[64])
+      if (pieces.getValidMovesForPiece(i, this.board).length !== 0) {
+        return false;
       }
     }
-    if (pieces.isInCheck(this.isWhiteTurn, this)) return true;
+    if (pieces.isInCheck(this.board[64] == "1", this.board)) return true;
     return null;
   }
 }
-
-const stdBoard = new StdBoard([
-  ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
-  ["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
-  ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", ""],
-  ["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
-  ["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
-]);
+let count2 = 0;
+const stdBoard = new Board(boardBoard);
+console.log(stdBoard)
 const bot = new Bot(false);
-/* std board 
-["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"],
-["pb", "pb", "pb", "pb", "pb", "pb", "pb", "pb"],
-["", "", "", "", "", "", "", ""],
-["", "", "", "", "", "", "", ""],
-["", "", "", "", "", "", "", ""],
-["", "", "", "", "", "", "", ""],
-["pw", "pw", "pw", "pw", "pw", "pw", "pw", "pw"],
-["rw", "nw", "bw", "qw", "kw", "bw", "nw", "rw"],
 
-["", "", "", "", "", "rb", "kb", ""],
-  ["pb", "pb", "pb", "", "", "", "pb", ""],
-  ["", "", "", "", "", "rb", "", ""],
-  ["", "", "", "pb", "pb", "", "bw", ""],
-  ["", "", "", "", "", "", "", ""],
-  ["", "", "", "pw", "", "", "pw", "qb"],
-  ["pw", "pw", "pw", "", "", "", "", ""],
-  ["rw", "", "", "", "", "qw", "kw", "rw"],
-*/
+stdBoard.perft()
+
