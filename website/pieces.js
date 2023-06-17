@@ -182,27 +182,27 @@ class Pieces {
           (endX !== 2 && endX !== 6) ||
           startX !== 4
         ) {
-          board = this.setCharAt(board, this.boardKingPos(isWhite), "1");
+          board[this.boardKingPos(isWhite)] = "1"
           break;
         }
         if (isWhite) {
           if (endX == 2) {
-            board = this.setCharAt(board, 56, "e");
-            board = this.setCharAt(board, 59, "R");
+            board[56] = "e"
+            board[59] = "R"
           } else {
-            board = this.setCharAt(board, 63, "e");
-            board = this.setCharAt(board, 61, "R");
+            board[63] = "e"
+            board[61] = "R"
           }
         } else {
           if (endX == 2) {
-            board = this.setCharAt(board, 0, "e");
-            board = this.setCharAt(board, 3, "r");
+            board[0] = "e"
+            board[3] = "r"
           } else {
-            board = this.setCharAt(board, 7, "e");
-            board = this.setCharAt(board, 5, "r");
+            board[7] = "e"
+            board[5] = "r"
           }
         }
-        board = this.setCharAt(board, this.boardKingPos(isWhite), "1");
+        board[this.boardKingPos(isWhite)] = "1"
         break;
       case "r":
         const startx = startPos & 7,
@@ -212,18 +212,16 @@ class Pieces {
           (starty !== 0 && starty !== 7)
         )
           break;
-        board = this.setCharAt(board, this.boardRookPos(isWhite, startx == 0), "1");
+        board[this.boardRookPos(isWhite, startx == 0)] = "1"
         break;
       case "p":
         const pY = endPos >>> 3
         if (pY == 0 || pY == 7) {
-          board = this.setCharAt(board, startPos, isWhite ? "Q" : "q");
+          board[startPos] = isWhite ? "Q" : "q"
         }
     }
-    board = this.setCharAt(board, endPos, board[startPos]);
-    board = this.setCharAt(board, startPos, "e");
-
-    return board
+    board[endPos] = board[startPos]
+    board[startPos] = "e"
   }
   getMovesForPiece(pos, board) {
     const piece = board[pos],
@@ -393,8 +391,8 @@ class Pieces {
     const moves = this.getMovesForPiece(pos, board);
     const validMoves = [];
     moves.forEach((move) => {
-      let newBoard = board;
-      newBoard = this.movePiece(pos, move, newBoard);
+      const newBoard = stdBoard.cloneBoard(board);
+      this.movePiece(pos, move, newBoard);
       if (this.isInCheck(newBoard[64] == "1", newBoard)) return;
       validMoves.push(move);
     });
@@ -453,9 +451,6 @@ class Pieces {
   }
   boardRookPos(isWhite, leftRook) {
     return 65 + 3 * isWhite + 2 * !leftRook;
-  }
-  setCharAt(str, index, chr) {
-    return str.substring(0, index) + chr + str.substring(index + 1);
   }
 }
 const pieces = new Pieces();

@@ -11,7 +11,7 @@ class Bot {
     const time = Date.now();
     const move = this.newMove(board, 4);
     console.log(move, Date.now() - time);
-    stdBoard.board = pieces.movePiece(move.startMove.start, move.startMove.end, board);
+    pieces.movePiece(move.startMove.start, move.startMove.end, board);
     stdBoard.resetBoard();
   }
   newMove(board, maxDepth, depth, startMove) {
@@ -33,10 +33,10 @@ class Bot {
         totalMoves += moves.length;
         for (let u = 0; u < moves.length; u++) {
           const move = moves[u];
-          let newBoard = board;
-          newBoard = pieces.setCharAt(newBoard, 64, newBoard[64] == "0" ? "1":"0")
+          const newBoard = stdBoard.cloneBoard(board);
+          newBoard[64] = newBoard[64] == "0" ? "1":"0"
 
-          newBoard = pieces.movePiece(i, move, newBoard);
+          pieces.movePiece(i, move, newBoard);
 
           let r;
           if (startMove) {
@@ -133,6 +133,6 @@ class Bot {
           ).points;
         }
     }
-    return wPoints - bPoints + (wMoves.length - bMoves.length) / 2;
+    return wPoints - bPoints + (wMoves.length - bMoves.length) / 5;
   }
 }

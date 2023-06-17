@@ -1,6 +1,6 @@
 const boardBoard =
-  "rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR1000000";
-  //stdBoard rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR1000000
+["r","n","b","q","k","b","n","r","p","p","p","p","p","p","p","p","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","e","P","P","P","P","P","P","P","P","R","N","B","Q","K","B","N","R","1","0","0","0","0","0","0"];
+//stdBoard rnbqkbnrppppppppeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeePPPPPPPPRNBQKBNR1000000
 //pieces -> isWhiteTurn -> r/k moved
 /*class Board {
   constructor(board, moved, pawnMoves) {
@@ -34,7 +34,7 @@ class Board {
   selectedNode = null
   htmlBoard = document.getElementById("board");
   perft(){
-    this.board = pieces.setCharAt(this.board,64,"1");
+    this.board[64] = "1"
     bot.genNewMove(this.board);
     console.log("perft: " + count2)
   }
@@ -68,8 +68,8 @@ class Board {
   clickNode(node) {
     console.log(node)
     if (this.dots.includes(node)) {
-      this.board = pieces.movePiece(this.selectedNode, node, this.board);
-      this.board = pieces.setCharAt(this.board, 64, this.board[64] == "1"?"0":"1")
+      pieces.movePiece(this.selectedNode, node, this.board);
+      this.board[64] = this.board[64] == "1"?"0":"1"
       this.resetSelectedNode(true)
       const ended = this.hasGameEnded();
       if (ended)
@@ -77,8 +77,8 @@ class Board {
       else if (ended == null) console.log("Stalemate");
       else
         setTimeout(() => {
-          //bot.genNewMove(this.board);
-          //this.board = pieces.setCharAt(this.board,64,this.board[64] == "1" ? "0":"1");
+          bot.genNewMove(this.board);
+          this.board[64] = this.board[64] == "1" ? "0":"1"
         }, 100);
       return;
     } else if (this.board[node] == "e") {
@@ -102,7 +102,6 @@ class Board {
   }
   hasGameEnded() {
     for (let i = 0; i < 64; i++) {
-      console.log(this.board[i], this.board[64])
       if (pieces.isPieceBlack(this.board[i]) == (this.board[64] == "1")) continue;
       //console.log(this.board[i], this.board[64])
       if (pieces.getValidMovesForPiece(i, this.board).length !== 0) {
@@ -112,11 +111,12 @@ class Board {
     if (pieces.isInCheck(this.board[64] == "1", this.board)) return true;
     return null;
   }
+  cloneBoard(board) {
+    return board.slice(0)
+  }
 }
 let count2 = 0;
 const stdBoard = new Board(boardBoard);
 console.log(stdBoard)
 const bot = new Bot(false);
-
-stdBoard.perft()
 
